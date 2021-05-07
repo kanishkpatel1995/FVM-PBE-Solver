@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from CLDfromExpData import ExperimentalCLD
-
+import seaborn as sns
 ##### Method 1 
 def LogNormalFunc(D,sigma,D_0,D_max):
     f = np.zeros(len(D))
@@ -178,12 +178,24 @@ def CLDtoDSDMethod2(specify_csv_filename,specify_time, provide_mean_lengths = No
 #### TRIAL USAGE #########
 
 
-# DSD = CLDtoDSDMethod1('Experiment 2020-11-27 10-34 Default.csv','Last Time')
-# L_32,L_43, D_32, D_43, unreal_D43, unreal_D32 = CLDtoDSDMethod2('Experiment 2020-11-27 10-34 Default.csv','Last Time',
-#                                                                 provide_mean_lengths=True)
-# CLD = ExperimentalCLD('Experiment 2020-11-27 10-34 Default.csv','Last Time')
-# plt.semilogx(CLD.iloc[:,0].values , CLD.iloc[:,1].values,label = f'CLD')
-# plt.semilogx(DSD['Diameter'].values , DSD['Counts'].values,label = f'Method 1') 
+DSD = CLDtoDSDMethod1('Experiment 2020-11-27 10-34 Default.csv','Last Time')
+DSDm2 = CLDtoDSDMethod2('Experiment 2020-11-27 10-34 Default.csv','Last Time')
+L_32,L_43, D_32, D_43, unreal_D43, unreal_D32 = CLDtoDSDMethod2('Experiment 2020-11-27 10-34 Default.csv','Last Time',
+                                                                provide_mean_lengths=True)
+CLD = ExperimentalCLD('Experiment 2020-11-27 10-34 Default.csv','Last Time')
+sns.set_theme(context = 'paper', style = 'ticks', font_scale = 2, palette='bright')
+sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+plt.figure(figsize = (10,10))
+plt.semilogx(CLD.iloc[:,0].values , CLD.iloc[:,1].values,label = 'CLD', 
+             linewidth = 2, color = 'black')
+plt.semilogx(DSD['Diameter'].values , DSD['Counts'].values,label = 'Method 1', 
+             linewidth = 2, color = 'red') 
+plt.semilogx(DSDm2['Diameter'].values , DSDm2['Counts'].values,label = 'Method 2', 
+             linewidth = 2, color = 'blue')
+plt.xlabel('Diameter')
+plt.ylabel('Frequency')
+plt.legend(frameon = False)
+plt.savefig('CLDtoDSDCOnversion.jpg', dpi = 300, bbox_inches = 'tight')
 # plt.semilogx(DSD_m2['Diameter'].values , DSD_m2['Counts'].values,label = f'Method 2')   
     
     

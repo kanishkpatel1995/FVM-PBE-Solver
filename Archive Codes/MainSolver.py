@@ -16,7 +16,7 @@ from TemporalGrid import TemporalGrid
 from BreakageFunction import BreakageFunction
 from SelectionFunction import SelectionFunction
 from CoagulationFunction import CoagulationFunction
-from AMatrix import APureBreakage
+# from AMatrix import APureBreakage
 from AnalyticalSolution import AnalyticalSolution
 from InitialCondition import InitialConditionNumberDensity
 

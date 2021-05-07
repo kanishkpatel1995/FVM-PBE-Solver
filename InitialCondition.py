@@ -11,6 +11,7 @@ from scipy.stats import lognorm
 from scipy.optimize import curve_fit
 import pandas as pd
 from scipy.stats import lognorm
+import scipy
 
 class InitialConditionNumberDensity:
     # x vector or the initial x coordinate must be specified for the 
@@ -19,7 +20,7 @@ class InitialConditionNumberDensity:
      # total mass of the particles irrespective of the initial condition
     global total_massICND
     total_massICND = 1
-    def __init__(self,x, delta_x, no_of_nodes):
+    def __init__(self,x, delta_x, no_of_nodes = 16):
         self.x = x
         self.delta_x = delta_x
         self.no_of_nodes = no_of_nodes
@@ -73,7 +74,7 @@ class InitialConditionNumberDensity:
         return lognormal(self.x, popt[0],popt[1]*4,popt[2]*0.1)*ky        
         
     def InitialConditionBasedMeanandStd(self,mu,sigma):
-        mu, sigma = 50, 14.6 #in micrometers
+        # mu, sigma = 50, 14.6 #in micrometers
         lnsigma = np.sqrt(np.log( np.square(sigma) / np.square(mu) + 1) );
         lnmu = np.log(mu/np.exp(0.5*np.square(lnsigma)));
         ## random will give me approximate droplet sizes
@@ -84,5 +85,21 @@ class InitialConditionNumberDensity:
         shape,loc,scale = lognorm.fit(droplet_counts)
         d = np.logspace(np.log10(droplet_counts.min()),np.log10(droplet_counts.max()),self.no_of_nodes)
         pdf = lognorm.pdf(d, shape, loc, scale)
-        return pdf*self.x
+        return pdf
+    
+    def NormDistributionBasedMeanandStd(self,mu,sigma):
+        mu = mu*1e-6 # Mean of sample !!! Make sure your data is positive for the lognormal example 
+        sigma = sigma*1e-6 # Standard deviation of sample
+        N = 6000 # Number of samples
+        
+        norm_dist = scipy.stats.norm(loc=mu, scale=sigma) # Create Random Process
+        x = norm_dist.rvs(size=N) # Generate samples
+        
+        # Fit normal
+        fitting_params = scipy.stats.norm.fit(x)
+        norm_dist_fitted = scipy.stats.norm(*fitting_params)
+        return norm_dist.pdf(self.x)
+
+    
+    
         

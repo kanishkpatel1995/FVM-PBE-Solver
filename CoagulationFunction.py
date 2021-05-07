@@ -44,7 +44,7 @@ def CoagulationFunction(u,v,type_coagulation_function= None, C6 = 0.5, C7 = 0.5,
         k1 = (C7*muCP*rhoCP*DissipationRate)/(np.square(sigma))
         k2 = np.power(np.power(u*v,1/3)/(np.power(u,1/3)+ np.power(v,1/3)),4)
         return beta* np.exp(-k1*k2)
-# CoagulationFunction(1e-8,1,"CandT")
+
 
 
 

@@ -16,11 +16,12 @@ def BreakageFunction(u,v,type_of_breakage_function = None, C1=2, C2 = 2, phiDP =
     dj = np.power((3*v)/(4*np.pi),1/3)
     if type_of_breakage_function == 'BinaryBreakage':
         return 2/v
-    elif type_of_breakage_function == 'CandT': # Coulaloglou and Tavlarides 
+    elif type_of_breakage_function == 'CandT' or type_of_breakage_function == None : # Coulaloglou and Tavlarides 
     # parameters a and b = 2 for the caase of binary breakage.
         return ((1/dj)*(gamma(C1+C2)/(gamma(C1)*gamma(C2))) * 
                 np.power(di/dj,(1/3)*(C1-1))*
                 np.power(1 - (di/dj), C2-1))
+    
     elif type_of_breakage_function == 'alopeaus':
         # a = 0.5 # in this case a = geometric standard deviation
         #its value equal to 0.5 is assumed for dilute systems from paper of 
@@ -39,10 +40,10 @@ def BreakageFunction(u,v,type_of_breakage_function = None, C1=2, C2 = 2, phiDP =
         # a = 0.0577## s4 original value from the paper of Becker et.al. 2011
         # b = 0.558  # s5 parameter original value from the paper of Becker et.al. 2011
         alpha = np.exp(C1*np.log(muCP/muDP) - C2)
-        ratio = (SelectionFunction(v,type_s = 'SandR', c = None, e = None, f= None, phiDP = phiDP,
+        ratio = (SelectionFunction(v,type_s = 'SandR', C3 = None, C4 = None, C5= None, phiDP = phiDP,
                       muCP = muCP, muDP = muDP, sigma = sigma, rhoCP = rhoCP,
                       rhoDP = rhoDP,DissipationRate= DissipationRate, D = D, We = We)/
-                 SelectionFunction(u,type_s = 'SandR', c = None, e = None, f= None, phiDP = phiDP,
+                 SelectionFunction(u,type_s = 'SandR', C3 = None, C4 = None, C5= None, phiDP = phiDP,
                       muCP = muCP, muDP = muDP, sigma = sigma, rhoCP = rhoCP,
                       rhoDP = rhoDP,DissipationRate= DissipationRate, D = D, We = We))
         nume = np.power(ratio, alpha)
@@ -55,6 +56,9 @@ def BreakageFunction(u,v,type_of_breakage_function = None, C1=2, C2 = 2, phiDP =
         k = (4.8/v) * np.exp(-(4.5 *np.square(2*u - v))/(np.square(v)))
         # print(u,v, k)
         return k
+    
+    # elif type_of_breakage_function == 'newone':
+    #     return we
     
         
         

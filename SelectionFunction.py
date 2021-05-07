@@ -49,7 +49,7 @@ def SelectionFunction(x,type_s = None, C3 = 4.87e-3, C4 = 0.0552, C5= None, phiD
         integral_val = integrate.quad(integral, 0.12, alpha_d)
         return (0.0035*C3*np.sqrt(np.log(Li/d))*
                 (np.power(C4*DissipationRate,1/3)/np.power(d,2/3))*integral_val[0])
-    elif type_s == 'alopaeus':
+    elif type_s == 'alopeaus':
         if C3 == None or C4 == None or C5 == None:
             C3 = 0.986
             C4 = 0.892e-3

@@ -28,104 +28,6 @@ from InitialCondition import InitialConditionNumberDensity
 ### timestmp
 timestr = time.strftime("%Y%m%d%H%M%S")
 
-# class APureBreakage:
-#         def __init__(self, x, x_node_boundaries, delta_x, type_of_selection_function, 
-#                       type_of_breakage_function):
-#             self.x = x
-#             self.x_node_boundaries = x_node_boundaries
-#             self.delta_x = delta_x
-#             self.type_s = type_of_selection_function
-#             self.type_of_breakage_function = type_of_breakage_function
-#         def derec(self,k,i):
-#             d_k_i = 0
-#             inner_integral = 0
-#             if i>=0:
-#                 for j in range(i+1): 
-#                     inner_integral = inner_integral + self.x[j]*BreakageFunction(self.x[j],
-#                                                                                   self.x[k],
-#                                                                                   self.type_of_breakage_function)*self.delta_x[j]
-#             else :
-#                 inner_integral = 0
-#             d_k_i = SelectionFunction(self.x[k],self.type_s)*(1/self.x[k])*self.delta_x[k]*inner_integral
-#             return d_k_i
-    
-#         def A(self):
-#             A = np.zeros((len(self.x),len(self.x)))
-#             for i in range(len(self.x)):
-#                 #print(i) 
-#                 A[i,i] = -(1/self.delta_x[i])*self.derec(i,i-1) # diagonal elements
-#                 for k in range(i+1,len(self.x)):
-#                     A[i,k] = -(1/self.delta_x[i]) * (self.derec( k, i-1) - 
-#                                               self.derec( k, i))
-#             return A
-
-# class APureAggregation:
-#     ### Getting spatial matrix A pure aggregation ###
-#     # we need to add g array from previous timestep as the solution is now dependent on g 
-#     def __init__(self, x, x_node_boundaries, delta_x,g,type_coagulation_function):
-#         self.x = x
-#         self.x_node_boundaries = x_node_boundaries
-#         self.delta_x = delta_x
-#         self.g = g # it is the mass density matrix
-#         self.type_coagulation_function = type_coagulation_function
-#     def derec(self,i,k):
-#         ### Evaluating alpha
-#         x = self.x
-#         x_node_boundaries = self.x_node_boundaries
-#         delta_x = self.delta_x
-#         g = self.g
-#         value = x_node_boundaries[i+1] - x[k]
-#         array = np.asarray(x_node_boundaries)
-#         idx = (np.abs(array - value)).argmin()
-#         if value > array[idx]:
-#             alpha = idx + 1
-#         elif value == 0:
-#             alpha = idx + 1
-#             ## on the last cell the node boundary value is same as the node value
-#             #henceforth value = x_node_boundaries[i+1] - x[k] came out to be zero.
-#             ## For an integral with 1/x a zero value will result in sigularity. 
-#             ## to avoid this the value of 0 is made equivalent to the size of the smallest particle.
-#             value = x_node_boundaries[0] ## making value equal to smallest particle
-#             # value = 1e-12
-#         else:
-#             alpha = idx
-#         # print(x[alpha:len(x)],alpha)
-#         rhs_term1 = np.sum(g[alpha:]*(1/x[alpha:])*
-#                            CoagulationFunction(x[alpha:], x[k], self.type_coagulation_function)
-#                            *delta_x[alpha:])
-#         # print(CoagulationFunction(x[alpha:], x[k], self.type_coagulation_function))
-#         def integrand(x,a):
-#             return (1/x)*CoagulationFunction(x,a,self.type_coagulation_function)
-#         # using sci py quad function for integration 
-#         a = x[k]
-#         I = quad(integrand, value, x_node_boundaries[alpha],args=(a))
-#         rhs_term2 = g[alpha - 1] * I[0]
-        
-#         # # using mid point rule instead of integrand
-#         # x_midpoint = (value + x_node_boundaries[alpha])/2
-#         # rhs_term2 = integrand(x_midpoint, x[k])*(x_node_boundaries[alpha] - value)
-#         # print(I,alpha,value,x_node_boundaries[alpha])
-#         return rhs_term1 +rhs_term2
-         
-
-#     def A(self):
-#         A = np.zeros((len(self.x),len(self.x)))
-#         J = np.zeros((len(self.x),len(self.x)))
-#         for i in range(len(self.x)):
-#             # print(i)
-#             for j in range(i+1):
-#                 J[i,j] = self.delta_x[j] * self.derec(i,j)
-#         for i in range(len(A[:,0])):
-#             if i == 0:
-#                 A[i,:] = (-1/self.delta_x[i]) * J[i,:]
-#             else:
-#                 A[i,:] = (-1/self.delta_x[i]) * (J[i,:] - J[i-1,:])
-#         # print(A)
-#         return A
-    
-
-
-
 def PBEBrkAggSolver(minimimum_particle_size, 
                maximum_particle_size,
                no_of_nodes,
@@ -195,10 +97,14 @@ def PBEBrkAggSolver(minimimum_particle_size,
         g0 = InitialConditionNumberDensity(x, delta_x).Solsvik_LogNormalDistribution()
     elif type_of_initial_condition == 'mimicReality':
         if mean == None or std == None:
-            mean = 50 ### mean particle dimeter size 
+            mean = 50 ### mean particle dimeter size # in Microns
             std = 14.6
         g0 = InitialConditionNumberDensity(x, delta_x, no_of_nodes).InitialConditionBasedMeanandStd(mean,std)
-    
+    elif type_of_initial_condition == 'NormDist':
+        if mean == None or std == None:
+                mean = 50 ### mean particle dimeter size 
+                std = 14.6
+        g0 = InitialConditionNumberDensity(x, delta_x, no_of_nodes).NormDistributionBasedMeanandStd(mean,std)
     # g0[g0<1e-18] = 1e-18
     # Initial particle mass density
     ##################################################################################
@@ -419,7 +325,6 @@ def PBEBrkAggSolver(minimimum_particle_size,
             def pbe_ode(t,y):
                     A_mat = APureBreakage(x, x_node_boundaries,delta_x,
                                         type_of_selection_function,type_of_breakage_function).A()
-                    A_mat[A_mat<1e-18] = 1e-18
                     dy_dt = np.matmul(A_mat,y)
                     return dy_dt
         elif type_of_problem == 'pAgg':
@@ -552,7 +457,11 @@ def PBEBrkAggSolver(minimimum_particle_size,
            'D': D, 
            'We': We,
            'FinalD32':FinalD32,
-           'FinalD43':FinalD43}
+           'FinalD43':FinalD43,
+           'InitialNumberofParticles':total_number_of_particles[0],
+           'TotalNumberofParticles':total_number_of_particles[-1],
+           'TotalMass': total_mass[-1], 
+           'TimeTakenBySolver' : timeTakenBySolver}
     try:
         os.chdir('DataML2')
         with open(timestr+'.txt', 'w') as outfile:
