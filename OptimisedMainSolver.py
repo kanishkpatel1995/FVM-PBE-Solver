@@ -399,7 +399,7 @@ def PBEBrkAggSolver(minimimum_particle_size,
                         type_of_selection_function + 
                         type_of_breakage_function + 
                         type_coagulation_function + '.csv')
-            filename_nd = ('num_den_diff_times'+ temporal_solver + str(no_of_nodes) + 
+            filename_nd = (str(timestr)+'num_den_diff_times'+ temporal_solver + str(no_of_nodes) + 
                         str(int(delta_t*100)) +
                         type_of_initial_condition + 
                         type_of_selection_function + 
@@ -417,7 +417,7 @@ def PBEBrkAggSolver(minimimum_particle_size,
                         type_of_selection_function + 
                         type_of_breakage_function + 
                         type_coagulation_function + '.csv')
-            filename_nd = ('num_den_diff_times'+ temporal_solver + str(no_of_nodes) + 
+            filename_nd = (str(timestr)+'num_den_diff_times'+ temporal_solver + str(no_of_nodes) + 
                         str(int(delta_t*100)) +
                         type_of_initial_condition + 
                         type_of_selection_function + 

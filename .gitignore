@@ -1,4 +1,5 @@
 Images/
+__pycache__/
 .__pycache__/
 Error/
 Validation/
